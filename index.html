@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cumpleaños de Mamá</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="card">
+    <div class="balloons">🎈 🎂 🎈</div>
+    <p class="eyebrow">Una celebración muy especial</p>
+    <h1>El cumpleaños de Mamá</h1>
+    <div class="date">28 de octubre</div>
+    <p class="message">
+      Queremos celebrar este día tan especial rodeados de las personas que queremos.
+      Por favor, confirma si podrás acompañarnos.
+    </p>
+
+    <section id="choice" class="section">
+      <h2>¿Nos acompañarás?</h2>
+      <div class="buttons">
+        <button id="yesBtn" class="primary">❤️ Sí, asistiré</button>
+        <button id="noBtn" class="secondary">No podré asistir</button>
+      </div>
+    </section>
+
+    <section id="formSection" class="section hidden">
+      <h2>¡Qué alegría! 🎉</h2>
+      <label for="name">Escribe tu nombre</label>
+      <input id="name" type="text" maxlength="80" placeholder="Tu nombre completo" autocomplete="name">
+      <button id="confirmBtn" class="primary full">Confirmar asistencia</button>
+    </section>
+
+    <section id="noSection" class="section hidden">
+      <h2>Gracias por avisarnos 💙</h2>
+      <p>Sentiremos mucho que no puedas acompañarnos. ¡Gracias por confirmar!</p>
+      <button id="noConfirmBtn" class="secondary full">Confirmar que no asistiré</button>
+    </section>
+
+    <section id="success" class="section hidden">
+      <div class="successIcon">✓</div>
+      <h2>¡Asistencia confirmada!</h2>
+      <p id="successText"></p>
+      <button id="shareBtn" class="whatsapp">💬 Compartir invitación por WhatsApp</button>
+    </section>
+
+    <p id="error" class="error hidden"></p>
+  </main>
+
+  <footer>
+    Invitación familiar • 28 de octubre
+  </footer>
+
+<script>
+const API_URL = "/api/rsvp";
+
+const choice = document.getElementById("choice");
+const formSection = document.getElementById("formSection");
+const noSection = document.getElementById("noSection");
+const success = document.getElementById("success");
+const errorBox = document.getElementById("error");
+const nameInput = document.getElementById("name");
+let lastName = "";
+
+function showError(msg) {
+  errorBox.textContent = msg;
+  errorBox.classList.remove("hidden");
+}
+function clearError() { errorBox.classList.add("hidden"); }
+
+document.getElementById("yesBtn").onclick = () => {
+  clearError();
+  choice.classList.add("hidden");
+  formSection.classList.remove("hidden");
+  nameInput.focus();
+};
+
+document.getElementById("noBtn").onclick = () => {
+  clearError();
+  choice.classList.add("hidden");
+  noSection.classList.remove("hidden");
+};
+
+async function sendRSVP(attending, name="") {
+  const response = await fetch(API_URL, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ name, attending })
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || "No se pudo guardar la respuesta.");
+  return data;
+}
+
+document.getElementById("confirmBtn").onclick = async () => {
+  clearError();
+  const name = nameInput.value.trim();
+  if (!name) return showError("Por favor, escribe tu nombre.");
+  const btn = document.getElementById("confirmBtn");
+  btn.disabled = true;
+  btn.textContent = "Guardando...";
+  try {
+    await sendRSVP(true, name);
+    lastName = name;
+    formSection.classList.add("hidden");
+    success.classList.remove("hidden");
+    document.getElementById("successText").textContent =
+      `${name}, tu asistencia quedó registrada. ¡Nos vemos el 28 de octubre!`;
+  } catch (e) {
+    showError(e.message);
+    btn.disabled = false;
+    btn.textContent = "Confirmar asistencia";
+  }
+};
+
+document.getElementById("noConfirmBtn").onclick = async () => {
+  const btn = document.getElementById("noConfirmBtn");
+  btn.disabled = true;
+  btn.textContent = "Guardando...";
+  try {
+    await sendRSVP(false);
+    noSection.classList.add("hidden");
+    success.classList.remove("hidden");
+    document.getElementById("successText").textContent =
+      "Tu respuesta quedó registrada. ¡Gracias por avisarnos!";
+  } catch (e) {
+    showError(e.message);
+    btn.disabled = false;
+    btn.textContent = "Confirmar que no asistiré";
+  }
+};
+
+document.getElementById("shareBtn").onclick = () => {
+  const url = window.location.href;
+  const text = `🎂 Invitación al cumpleaños de Mamá\n📅 28 de octubre\n\nConfirma tu asistencia aquí:\n${url}`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+};
+</script>
+</body>
+</html>
