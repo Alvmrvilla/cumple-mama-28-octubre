@@ -10,7 +10,7 @@
   <main class="card">
     <div class="balloons">🎈 🎂 🎈</div>
     <p class="eyebrow">Una celebración muy especial</p>
-    <h1>El cumpleaños de Mamá</h1>
+    <h1>El cumpleaños de Dinora Maravilla</h1>
     <div class="date">28 de octubre</div>
     <p class="message">
       Queremos celebrar este día tan especial rodeados de las personas que queremos.
@@ -21,7 +21,7 @@
       <h2>¿Nos acompañarás?</h2>
       <div class="buttons">
         <button id="yesBtn" class="primary">❤️ Sí, asistiré</button>
-        <button id="noBtn" class="secondary">No podré asistir</button>
+        <button id="noBtn" class="secondary">No podré asistir 😔 </button>
       </div>
     </section>
 
@@ -133,7 +133,7 @@ document.getElementById("noConfirmBtn").onclick = async () => {
 
 document.getElementById("shareBtn").onclick = () => {
   const url = window.location.href;
-  const text = `🎂 Invitación al cumpleaños de Mamá\n📅 28 de octubre\n\nConfirma tu asistencia aquí:\n${url}`;
+  const text = `🎂 Invitación al cumpleaños de Dinora Maravilla\n📅 28 de octubre\n\nConfirma tu asistencia aquí:\n${url}`;
   window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
 };
 </script>
